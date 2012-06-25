@@ -72,9 +72,9 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 	 	 'WHERE' => '1'
 	 	 	 			. (	$this->config['pidList'] ? ' AND '.$this->tableName.'.pid in ('.implode(',', $this->getRecursivePid( $this->config['pidList'], $this->config['recursive'] )).')' : '')
 	 	 	 			. $this->cObj->enableFields($this->tableName),
-	 	 	 'GROUP BY' => '',
-	 	 	 'ORDER BY' => '',
-	 	 	 'LIMIT' => ''
+	 	 	 'GROUP BY' => ($this->config['groupBy'] ? $this->config['groupBy'] : ''),
+	 	 	 'ORDER BY' => ($this->config['orderBy'] ? $this->config['orderBy'] : ''),
+	 	 	 'LIMIT' => ($this->config['limit'] ? $this->config['limit'] : '')
 	 	 	 );
 	 }
 
