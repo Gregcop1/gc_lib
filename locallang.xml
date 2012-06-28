@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for plugin &quot;tx_indirectory_pi1&quot;</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="flexform.configuration">Plugin's configuration</label>
+			<label index="flexform.code">Display</label>
+			<label index="flexform.additionalTSConfig">Additional typoscript configuration (plugin.tx_ingallery_pi1.config.[your TS]</label>
+		</languageKey>
+		<languageKey index="fr" type="array">
+			<label index="flexform.configuration">Configuration du plugin</label>
+			<label index="flexform.code">Affichage</label>
+			<label index="flexform.additionalTSConfig">Configuration Typoscript additionnelle (plugin.tx_ingallery_pi1.config.[votre TS]</label>
+		</languageKey>
+	</data>
+</T3locallang>

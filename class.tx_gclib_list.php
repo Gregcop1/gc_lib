@@ -53,8 +53,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 	 $this->tableName = $tableName;
 	 	 $this->initStaticQueryParts();
 	 	 $this->initFilterQueryParts();
-	 	 
-	 	 $this->results = $this->execQuery( $this->query );
+	 	 //$this->results = $this->execQuery( $this->query );
 	 }	
 	 
 	 /*function setSubPart($subPart) {
@@ -66,6 +65,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  */
 	  function initStaticQueryParts() {
+	  	
 	 	 $this->query = array(
 	 	 	 'SELECT' => $this->tableName.'.*',
 	 	 	 'FROM' => $this->tableName,
