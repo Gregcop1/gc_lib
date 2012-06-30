@@ -62,7 +62,6 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 			$this->conf['config.'] = $tsparser->setup;
 		}
 		
-		
 		$this->config = $this->mergeConfAndFlexform($this->conf['config.']);
 	 }
 
