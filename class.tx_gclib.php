@@ -52,7 +52,6 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		$this->pi_loadLL();
 		$this->piFlexForm = t3lib_div::xml2array($this->cObj->data['pi_flexform']);
 		
-		
 		if($this->pi_getFFvalue($this->piFlexForm, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF')) {
 			$ffTS = $this->pi_getFFvalue($this->piFlexForm, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF');
 			
@@ -63,7 +62,8 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 			$this->conf['config.'] = $tsparser->setup;
 		}
 		
-		$this->config = $this->mergeConfAndFlexform($conf['config.']);
+		
+		$this->config = $this->mergeConfAndFlexform($this->conf['config.']);
 	 }
 
 
