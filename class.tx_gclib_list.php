@@ -47,14 +47,14 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 *
 	 * @return	The content that is displayed on the website
 	 */
-	function main($conf, $tableName = '') {
-	 	parent::main($conf);
+	 function main($conf, $tableName = '') {
+	 	 parent::main($conf);
 	 	 
-	 	$this->tableName = $tableName;
-	 	$this->initStaticQueryParts();
-	 	$this->initFilterQueryParts();
-	 	$this->results = $this->execQuery( $this->query );
-	}	
+	 	 $this->tableName = $tableName;
+	 	 $this->initStaticQueryParts();
+	 	 $this->initFilterQueryParts();
+	 	 //$this->results = $this->execQuery( $this->query );
+	 }	
 	 
 	 /*function setSubPart($subPart) {
 	 	 $this->subPart = $subPart;

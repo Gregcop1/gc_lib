@@ -46,7 +46,7 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 	 * @param	array		$conf: The PlugIn configuration
 	 * @return	The content that is displayed on the website
 	 */
-	function main($conf) {
+	 function main($conf) {
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
@@ -63,7 +63,7 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		}
 		
 		$this->config = $this->mergeConfAndFlexform($this->conf['config.']);
-	}
+	 }
 
 
 	 /**
@@ -75,7 +75,7 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 	function mergeConfAndFlexform($conf) {
 		$tabConf = array();
 		
-		if(is_array($conf) && count($conf)>0) {
+		if(count($conf)) {
 			foreach($conf as $key => $val){
 				if(is_array($val)) {
 					$tabConf[$key] = $this->mergeConfAndFlexform($val);
@@ -113,7 +113,7 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 				'pages',
 				'pages.pid = "'.$pid.'"'.$this->cObj->enableFields('pages')
 			);
-			if(is_array($res) && count( $res )) {
+			if(count( $res )) {
 				foreach( $res as $item ) {
 					$pidList = array_merge( $pidList, $this->getRecursivePid($item['uid'], ($recursive-1) ));
 				}
