@@ -31,10 +31,10 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
  * @package	TYPO3
  * @subpackage tx_gclib
  */
- class tx_gclib_base extends tx_gclib { 
+ class tx_gclib_base extends tx_gclib {
 	var $conf;
-	
-	
+
+
 	/**
 	 * The main method of the PlugIn
 	 *
@@ -44,8 +44,8 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 	 */
 	 function main($conf) {
 	 	 parent::main($conf);
-	 }	
-	 
+	 }
+
 	 function setPrefixId( $prefixId ) {
 	 	$this->prefixId = $prefixId;
 		$this->piVars = t3lib_div::_GPmerged($this->prefixId);
@@ -53,49 +53,49 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 			$GLOBALS['TSFE']->reqCHash();
 		}
 	 }
-	 
+
 	 /**
 	  * Apply markers to subPart
 	  *
-	  * @param	array	$conf: configuration of markers
+	  * @param	array	$configuration: configuration of markers
 	  * @param	array	&$markers: list of markers
 	  */
-	  function applyMarkers( $conf, &$markers) {
-	  	 foreach( $conf as $key=>$value ){
+	  function applyMarkers( $configuration, &$markers) {
+	  	 foreach( $configuration as $key=>$value ){
 			 if(substr($key, (strlen($key) -1) ) != '.') {
-				$markers['###'.$key.'###'] = $this->cObj->cObjGetSingle( $value, $conf[$key.'.'] );
+				$markers['###'.$key.'###'] = $this->cObj->cObjGetSingle( $value, $configuration[$key.'.'] );
 			 }
-		 }  
+		 }
 	  }
-	  
+
 	 /**
 	  * Building item rendering
 	  *
 	  * @param array $template: Html to parse
 	  * @param array $config: Typoscript configuration to apply
 	  * @param array $results: Results to include in template
-	  * 
+	  *
 	  * @return string : HTML content
 	  */
-	 function buildRender($template = array(), $config = array(), $results = array()) {
+	 function buildRender($template = array(), $configuration = array(), $results = array()) {
 	 	 $template['item'] = $this->cObj->getSubpart($template['total'], '###ITEM###');
 		 $out = '';
-		 
+
 		 if( $results && count($results) ) {
 			 foreach($results as $item) {
 				$markerArray=array();
 				$this->cObj->start( $item, $this->tableName );
-				$this->applyMarkers ( $config['markers.'], $markerArray );
+				$this->applyMarkers ( $configuration['markers.'], $markerArray );
 				$out .= $this->cObj->substituteMarkerArrayCached($template['item'],$markerArray);
 			 }
 		 }
-	  	 
+
 	  	 $subpartArray['###CONTENT###'] = $out;
-	  	 $this->applyMarkers ( $config['markers.'], $subpartArray );
-	  	 
+	  	 $this->applyMarkers ( $configuration['markers.'], $subpartArray );
+
 	  	 return $subpartArray;
 	 }
-	  
+
 	 /**
 	  * Execute items rendering
 	  *
@@ -103,16 +103,16 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 	  * @param array $subPart: Subpart to parse
 	  * @param array $config: Typoscript configuration to apply
 	  * @param array $results: Results to include in template
-	  * 
+	  *
 	  * @return string : HTML content
 	  */
-	  function render($templateFile = '', $subPart = '', $config = array(), $results = array() ) {
+	  function render($templateFile = '', $subPart = '', $configuration = array(), $results = array() ) {
 	  	 $templateCode = $this->cObj->fileResource($templateFile);
 	  	 $template = array();
 	  	 $template['total'] = $this->cObj->getSubpart($templateCode, '###'.$subPart.'###');
-		 
-	  	 $subpartArray = $this->buildRender( $template, $config, $results );
-	  	 
+
+	  	 $subpartArray = $this->buildRender( $template, $configuration, $results );
+
 	  	 return $this->cObj->substituteMarkerArrayCached($template['total'], array(),$subpartArray);
 	  }
  }

@@ -32,14 +32,14 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
  * @subpackage tx_gclib
  */
  class tx_gclib extends tslib_pibase {
- 	var $prefixId      = 'tx_gclib';		
+ 	var $prefixId      = 'tx_gclib';
 	var $scriptRelPath = 'class.tx_gclib.php';
-	var $extKey        = 'gc_lib';	
+	var $extKey        = 'gc_lib';
 	var $pi_checkCHash = true;
 	var $conf;
 	var $config;
-	
-	
+
+
 	/**
 	 * The main method of the PlugIn
 	 *
@@ -50,18 +50,18 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
-		$this->piFlexForm = t3lib_div::xml2array($this->cObj->data['pi_flexform']);
-		
-		if($this->pi_getFFvalue($this->piFlexForm, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF')) {
-			$ffTS = $this->pi_getFFvalue($this->piFlexForm, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF');
-			
+		$this->flexform = t3lib_div::xml2array($this->cObj->data['pi_flexform']);
+
+		if($this->pi_getFFvalue($this->flexform, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF')) {
+			$ffTS = $this->pi_getFFvalue($this->flexform, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF');
+
 			require_once(PATH_t3lib.'class.t3lib_tsparser.php');
-			$tsparser = t3lib_div::makeInstance('t3lib_tsparser');
-			$tsparser->setup = $this->conf['config.'];
-			$tsparser->parse($ffTS);
-			$this->conf['config.'] = $tsparser->setup;
+			$TSParser = t3lib_div::makeInstance('t3lib_tsparser');
+			$TSParser->setup = $this->conf['config.'];
+			$TSParser->parse($ffTS);
+			$this->conf['config.'] = $TSParser->setup;
 		}
-		
+
 		$this->config = $this->mergeConfAndFlexform($this->conf['config.']);
 	}
 
@@ -72,42 +72,42 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 	 * @param	array		$conf: The PlugIn configuration
 	 * @return	Merged array configuration
 	 */
-	function mergeConfAndFlexform($conf) {
-		$tabConf = array();
-		
-		if(is_array($conf) && count($conf)>0) {
-			foreach($conf as $key => $val){
+	function mergeConfAndFlexform($configuration) {
+		$mergedConfiguration = array();
+
+		if(is_array($configuration) && count($configuration)>0) {
+			foreach($configuration as $key => $val){
 				if(is_array($val)) {
-					$tabConf[$key] = $this->mergeConfAndFlexform($val);
+					$mergedConfiguration[$key] = $this->mergeConfAndFlexform($val);
 				}else {
 					list($sheet, $lang, $field, $value) = explode('|', $val);
 					if( $field ) {
-						$tabConf[$key] = $this->pi_getFFvalue($this->piFlexForm, $field, $sheet, $lang, $value);
+						$mergedConfiguration[$key] = $this->pi_getFFvalue($this->flexform, $field, $sheet, $lang, $value);
 					}else{
-						$tabConf[$key] = $val;
+						$mergedConfiguration[$key] = $val;
 					}
-					
-					$tabConf[$key] = $this->cObj->stdWrap( $tabConf[$key], $conf[$key.'.'] );
+
+					$mergedConfiguration[$key] = $this->cObj->stdWrap( $mergedConfiguration[$key], $configuration[$key.'.'] );
 				}
 			}
 		}
-		
-		return $tabConf;
+
+		return $mergedConfiguration;
 	}
-	
+
 	/**
 	 * Method to get a recursive array of page ids
 	 *
 	 * @param	string $pid: UID of the first page
-	 * @param	int	$recursive: Level of recursivity
+	 * @param	int	$recursiveLevel: Level of recursivity
 	 *
 	 * @return	array	Array of recursive pid
 	 */
-	function getRecursivePid($pid, $recursive = 0) {
-		$pidList = array();
-		$pidList[] = $pid;
-		
-		if($recursive > 0) {
+	function getRecursivePid($pid, $recursiveLevel = 0) {
+		$pids = array();
+		$pids[] = $pid;
+
+		if($recursiveLevel > 0) {
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 				'pages.uid',
 				'pages',
@@ -115,16 +115,16 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 			);
 			if(is_array($res) && count( $res )) {
 				foreach( $res as $item ) {
-					$pidList = array_merge( $pidList, $this->getRecursivePid($item['uid'], ($recursive-1) ));
+					$pids = array_merge( $pids, $this->getRecursivePid($item['uid'], ($recursiveLevel-1) ));
 				}
 			}
 		}
-		
-		return $pidList;
-	}
-	
 
-	/** 
+		return $pids;
+	}
+
+
+	/**
 	* Method to make an instance of class with predifened configuration
 	*
 	* @param	string	$path: path to the class
@@ -136,11 +136,11 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		$obj = t3lib_div::makeInstance($className);
 		$obj->parent = &$this;
 		$obj->cObj = clone $this->cObj;
-		  
+
 		if(method_exists($obj,'main')) {
 			$args = func_get_args();
 			$args = array_splice($args, 2);
-			
+
 			return call_user_func_array(array($obj,'main'), $args);
 		}
 	}
@@ -150,5 +150,5 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/gc_lib/class.tx_gclib.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/gc_lib/class.tx_gclib.php']);
 }
- 
+
  ?>
