@@ -50,6 +50,8 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
+		if (!$this->cObj)
+			$this->cObj = t3lib_div::makeInstance("tslib_cObj");
 		$this->flexform = t3lib_div::xml2array($this->cObj->data['pi_flexform']);
 
 		if($this->pi_getFFvalue($this->flexform, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF')) {
@@ -65,7 +67,37 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		$this->config = $this->mergeConfAndFlexform($this->conf['config.']);
 	}
 
+	 /**
+	 * Method to merge two array recursively
+	 *
+	 * @param	array		$arr1: Array to override
+	 * @param	array		$arr2: Array wich override
+	 * @return	Merged array
+	 */
+	public static function mergeArrayRecursive($arr1, $arr2) {
+		$savArr1 = $arr1;
+		$keys1 = is_array($arr1) ? array_keys($arr1) : array();
+		$keys2 = is_array($arr2) ? array_keys($arr2) : array();
+		$keys = array_merge($keys1, $keys2);
 
+		if(count($keys)) {
+			foreach($keys as $key) {
+				if(isset($arr2[$key])){
+					if(is_array($arr2[$key])){
+						if(!isset($arr1[$key])) {
+							$arr1[$key] = array();
+						}
+						$arr1[$key] = tx_gclib::mergeArrayRecursive($arr1[$key], $arr2[$key]);
+					}else {
+						$arr1[$key] = $arr2[$key];
+					}
+				}
+			}
+		}
+
+		return $arr1;
+	}
+	
 	 /**
 	 * Method to merge typoscript and flexform configuration
 	 *
@@ -86,8 +118,12 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 					}else{
 						$mergedConfiguration[$key] = $val;
 					}
-
-					$mergedConfiguration[$key] = $this->cObj->stdWrap( $mergedConfiguration[$key], $configuration[$key.'.'] );
+					if (method_exists($this->cObj,'stdWrap')) {
+						$mergedConfiguration[$key] = $this->cObj->stdWrap( $mergedConfiguration[$key], $configuration[$key.'.'] );
+					} else {
+						$cObj = t3lib_div::makeInstance("tslib_cObj");
+						$mergedConfiguration[$key] = $cObj->stdWrap( $mergedConfiguration[$key], $configuration[$key.'.'] );
+					}
 				}
 			}
 		}

@@ -52,12 +52,13 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 *
 	 * @return	The content that is displayed on the website
 	 */
-	 function main($conf, $id = '', $method = 'POST', $enctype = 'multipart/form-data', $action = '') {
+	 function main($conf, $id = '', $method = 'POST', $enctype = 'multipart/form-data', $action = '', $class = '') {
 	 	 parent::main($conf);
 	 	 
 	 	 $this->id = $id;
 	 	 $this->method = $method;
 	 	 $this->enctype = $enctype;
+	 	 $this->class = $class;
 	 	 if( trim($action) == '') {
 	 	 	 $action = $this->pi_linkTP_keepPIvars_url( array(), 1 );
 	 	 }	 	 
@@ -97,7 +98,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 function buildRender($template = array(), $config = array(), $results = array()) { 
 	 	 $subpartArray = parent::buildRender( $template, $config, $results );
 	 	 
-	 	 $subpartArray['###FORM_HEADER###'] = '<form id="'.$this->id.'" method="'.$this->method.'" enctype="'.$this->enctype.'" action="'.$this->action.'">';
+	 	 $subpartArray['###FORM_HEADER###'] = '<form id="'.$this->id.'" method="'.$this->method.'" enctype="'.$this->enctype.'" action="'.$this->action.'" class="'.$this->class.'">';
 	 	 $subpartArray['###FIELDS###'] = $this->renderFields(); 	 	 
 	 	 $subpartArray['###FORM_FOOTER###'] = '</form>';
 	 	 
