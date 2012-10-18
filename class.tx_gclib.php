@@ -97,7 +97,7 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 
 		return $arr1;
 	}
-	
+
 	 /**
 	 * Method to merge typoscript and flexform configuration
 	 *
@@ -180,6 +180,45 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 			return call_user_func_array(array($obj,'main'), $args);
 		}
 	}
+
+
+	/**
+	* Auto generate the ext_typoscript_setup file
+	*
+	* @param	array	$folders: folders to check
+	*
+	*****************************************************************************/
+  	public static function autoGenerateSetup($key, $folders){
+  		$ext_path = t3lib_extMgm::extPath($key);
+  		$setup = '';
+  		$eol = '
+';
+  		if($folders && count($folders)) {
+  			foreach ($folders as $folder) {
+  				if (is_dir($ext_path.$folder) && $handle = opendir($ext_path.$folder)) {
+				    $setup .= '### Include du dossier '.$folder.$eol;
+				    $files = array();
+
+					while ($files[] = readdir($handle));
+					sort($files);
+					closedir($handle);
+
+				    foreach ($files as $file) {
+				        if($file!='.' && $file!='..' && $extension = strrchr($file,'.') && (strrchr($file,'.') == '.ts' ) || strrchr($file,'.') == '.txt' ) {
+
+				        	$setup .= '<INCLUDE_TYPOSCRIPT: source="FILE:EXT:'.$key.'/'.$folder.$file.'">'.$eol;
+				        }
+				    }
+
+				    closedir($handle);
+				}
+  			}
+
+  			if($setup != '') {
+  				t3lib_div::writeFile($ext_path.'ext_typoscript_setup.txt',$setup);
+  			}
+  		}
+  	}
  }
 
 
