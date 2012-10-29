@@ -1,0 +1,5 @@
+.category_tree { position:relative; left:0px; top:0px; width:200px; border:solid 1px; max-height: 200px; overflow: auto; background-color: #ffffff; }
+.category_tree ul{ margin-left: 25px; }
+.category_tree ul ul{ margin-left: 10px; }
+.category_tree li{ list-style-image: url(../img/directory.gif); cursor: pointer }
+.category_tree li.notSelectable { cursor: default; }

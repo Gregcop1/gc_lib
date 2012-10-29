@@ -13,6 +13,7 @@ return array(
 	'tx_gclib_list' => $extensionPath . 'class.tx_gclib_list.php',
 	'tx_gclib_form' => $extensionPath . 'class.tx_gclib_form.php',
 	'tx_gclib_field' => $extensionPath . 'class.tx_gclib_field.php',
+	'tx_gclib_TCAform_selectTree' => $extensionPath . 'lib/class.tx_gclib_TCAform_selectTree.php',
 );
 unset($extensionPath);
 ?>

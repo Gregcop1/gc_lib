@@ -49,11 +49,13 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 */
 	function main($conf, $tableName = '') {
 	 	parent::main($conf);
-	 	 
-	 	$this->tableName = $tableName;
-	 	$this->initStaticQueryParts();
-	 	$this->initFilterQueryParts();
-	 	$this->results = $this->execQuery( $this->query );
+	 	
+	 	if($tableName) {
+		 	$this->tableName = $tableName;
+		 	$this->initStaticQueryParts();
+		 	$this->initFilterQueryParts();
+		 	$this->results = $this->execQuery( $this->query );
+		}
 	}	
 	 
 	 /*function setSubPart($subPart) {
