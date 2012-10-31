@@ -107,13 +107,17 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 	  * @return string : HTML content
 	  */
 	  function render($templateFile = '', $subPart = '', $configuration = array(), $results = array() ) {
-	  	 $templateCode = $this->cObj->fileResource($templateFile);
-	  	 $template = array();
-	  	 $template['total'] = $this->cObj->getSubpart($templateCode, '###'.$subPart.'###');
+	  	 $templateCode = $this->cObj->fileResource($templateFile);t3lib_div::debug($templateFile);
+	  	 if ($templateCode) {
+	  	 	$template = array();
+	  	 	$template['total'] = $this->cObj->getSubpart($templateCode, '###'.$subPart.'###');
 
-	  	 $subpartArray = $this->buildRender( $template, $configuration, $results );
+	  	 	$subpartArray = $this->buildRender( $template, $configuration, $results );
 
-	  	 return $this->cObj->substituteMarkerArrayCached($template['total'], array(),$subpartArray);
+	  	 	return $this->cObj->substituteMarkerArrayCached($template['total'], array(),$subpartArray);
+	  	} else {
+	  		return $this->pi_getLL('error.noTemplateFound');
+	  	}
 	  }
  }
 
