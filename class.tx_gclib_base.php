@@ -107,7 +107,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 	  * @return string : HTML content
 	  */
 	  function render($templateFile = '', $subPart = '', $configuration = array(), $results = array() ) {
-	  	 $templateCode = $this->cObj->fileResource($templateFile);t3lib_div::debug($templateFile);
+	  	 $templateCode = $this->cObj->fileResource($templateFile);
 	  	 if ($templateCode) {
 	  	 	$template = array();
 	  	 	$template['total'] = $this->cObj->getSubpart($templateCode, '###'.$subPart.'###');
