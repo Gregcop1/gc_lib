@@ -56,7 +56,7 @@ class tx_gclib_TCAform_selectTree {
         $this->field = $PA['field'];
         $this->row = $PA['row'];
         $this->fieldConfig = $PA['fieldConf']['config'];
-        
+
 
         $this->parentField = $this->fieldConfig['parentField'];
         if(!$this->parentField) {
@@ -65,13 +65,13 @@ class tx_gclib_TCAform_selectTree {
         $this->label = $PA['labelField'];
         if(!$this->label) {
             $this->label = 'title';
-        }            
+        }
         if($this->fieldConfig['foreign_table']) {
             $this->table = $this->fieldConfig['foreign_table'];
         }
         $this->setDefVals();
     }
-    
+
     function setDefVals() {
         if (!is_int($this->row['uid'])) { // defVals only for new records
             $defVals = t3lib_div::_GP('defVals');
@@ -83,11 +83,11 @@ class tx_gclib_TCAform_selectTree {
                  * check for allowed categories
                  */
                 if ($defCat) {
-                    $row = t3lib_BEfunc::getRecord('tt_news_cat', $defCat);
+                    $row = t3lib_BEfunc::getRecord($this->table, $defCat);
                     $title = t3lib_BEfunc::getRecordTitle($this->table,$row);
 
                     $this->PA['itemFormElValue'] = $defCat.'|'.$title;
-                    $this->row['category'] = $this->PA['itemFormElValue'];
+                    $this->row[$this->parentField] = $this->PA['itemFormElValue'];
                 }
             }
         }
