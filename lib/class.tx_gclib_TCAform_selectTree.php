@@ -69,6 +69,12 @@ class tx_gclib_TCAform_selectTree {
         if($this->fieldConfig['foreign_table']) {
             $this->table = $this->fieldConfig['foreign_table'];
         }
+
+        $this->back = $this->fieldConfig['back'];
+        if(!$this->back) {
+            $this->back = $this->fieldConfig['foreign_table'];
+        }
+
         $this->setDefVals();
     }
 
@@ -78,16 +84,13 @@ class tx_gclib_TCAform_selectTree {
 
             if (is_array($defVals) && $defVals[$this->table][$this->field]) {
                 $defCat = intval($defVals[$this->table][$this->field]);
-                /**
-                 * TODO:
-                 * check for allowed categories
-                 */
+
                 if ($defCat) {
                     $row = t3lib_BEfunc::getRecord($this->table, $defCat);
                     $title = t3lib_BEfunc::getRecordTitle($this->table,$row);
 
                     $this->PA['itemFormElValue'] = $defCat.'|'.$title;
-                    $this->row[$this->parentField] = $this->PA['itemFormElValue'];
+                    $this->row[$this->back] = $this->PA['itemFormElValue'];
                 }
             }
         }
