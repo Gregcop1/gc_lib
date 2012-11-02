@@ -71,11 +71,9 @@ class tx_gclib_TCAform_selectTree {
         }
 
         $this->back = $this->fieldConfig['back'];
-        if($this->fieldConfig['back']) {
+        if(!$this->back) {
             $this->back = $this->table;
         }
-
-
         $this->setDefVals();
     }
 
@@ -85,10 +83,7 @@ class tx_gclib_TCAform_selectTree {
 
             if (is_array($defVals) && $defVals[$this->table][$this->field]) {
                 $defCat = intval($defVals[$this->table][$this->field]);
-                /**
-                 * TODO:
-                 * check for allowed categories
-                 */
+
                 if ($defCat) {
                     $row = t3lib_BEfunc::getRecord($this->table, $defCat);
                     $title = t3lib_BEfunc::getRecordTitle($this->table,$row);
