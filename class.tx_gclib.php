@@ -50,8 +50,9 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
-		if (!$this->cObj)
+		if (!$this->cObj){
 			$this->cObj = t3lib_div::makeInstance("tslib_cObj");
+		}
 		$this->flexform = t3lib_div::xml2array($this->cObj->data['pi_flexform']);
 
 		if($this->pi_getFFvalue($this->flexform, 'additionalTSConfig', 'sDEF', 'lDEF', 'vDEF')) {

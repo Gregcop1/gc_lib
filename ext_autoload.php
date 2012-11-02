@@ -4,16 +4,16 @@
  *
  * $Id: ext_autoload.php $
  */
- 
+
  $extensionPath = t3lib_extMgm::extPath('gc_lib');
- 
+
 return array(
 	'tx_gclib' => $extensionPath . 'class.tx_gclib.php',
 	'tx_gclib_base' => $extensionPath . 'class.tx_gclib_base.php',
 	'tx_gclib_list' => $extensionPath . 'class.tx_gclib_list.php',
 	'tx_gclib_form' => $extensionPath . 'class.tx_gclib_form.php',
 	'tx_gclib_field' => $extensionPath . 'class.tx_gclib_field.php',
-	'tx_gclib_TCAform_selectTree' => $extensionPath . 'lib/class.tx_gclib_TCAform_selectTree.php',
+	'ux_t3lib_tree_pagetree_DataProvider' => $extensionPath . 'lib/class.ux_t3lib_tree_pagetree_DataProvider.php',
 );
 unset($extensionPath);
 ?>
