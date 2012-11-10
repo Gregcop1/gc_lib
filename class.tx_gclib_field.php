@@ -92,21 +92,20 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 
 	 	 //build the tag
 	 	 switch($this->type) {
-	 	 	 case 'submit':
-			 case 'text':{
-			 		 $format = '<%s id="%s" name="%s" class="%s" value="%s"/>';
-			 }break;
-			 case 'textarea':
-			 case 'select': {
-			 		 $format = '<%s id="%s" name="%s" class="%s">%s</%s>';
-			 }break;
+	 	 	case 'hidden':
+			case 'submit':
+			case 'text':{
+				$format = '<%s id="%s" name="%s" class="%s" value="%s"/>';
+			}break;
+			case 'textarea':
+			case 'select': {
+				$format = '<%s id="%s" name="%s" class="%s">%s</%s>';
+			}break;
 	 	 }
 
 	 	 $field = sprintf($format, $this->getTagName(), $this->id, $this->getName(), $this->getClass(), $this->getValue(), $this->getClosureTag());
 
 	 	 if( trim($this->template) != '' ){
-	 	 	 $out .=
-
 	 	 	 $subpartArray['###LABEL###'] = $label;
 	 	 	 $subpartArray['###FIELD###'] = $field;
 	 	 	 $subpartArray['###ERROR###'] = $this->error;

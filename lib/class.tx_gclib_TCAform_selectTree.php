@@ -118,7 +118,7 @@ class tx_gclib_TCAform_selectTree {
 
         // Exclude himself and assigned Categories
         $exclude = t3lib_div::trimExplode(',',$this->fieldConfig['removeItems'],1);
-        array_push($exclude, $row['uid']);
+
         $exclude = array_merge($exclude,$assignedCategories);
 
         // All Categories
