@@ -8,12 +8,20 @@
 		<languageKey index="default" type="array">
 			<label index="flexform.configuration">Plugin's configuration</label>
 			<label index="flexform.code">Display</label>
-			<label index="flexform.additionalTSConfig">Additional typoscript configuration (plugin.tx_ingallery_pi1.config.[your TS]</label>
+			<label index="flexform.additionalTSConfig">Additional typoscript configuration (plugin.tx_ext_pi1.config.[your TS]</label>
+
+			<label index="error.form.required">This field is required</label>
+			<label index="error.form.mustBeEmpty">This field must be empty</label>
+			<label index="error.form.email">This field must be an valid email</label>
 		</languageKey>
 		<languageKey index="fr" type="array">
 			<label index="flexform.configuration">Configuration du plugin</label>
 			<label index="flexform.code">Affichage</label>
-			<label index="flexform.additionalTSConfig">Configuration Typoscript additionnelle (plugin.tx_ingallery_pi1.config.[votre TS]</label>
+			<label index="flexform.additionalTSConfig">Configuration Typoscript additionnelle (plugin.tx_ext_pi1.config.[votre TS]</label>
+
+			<label index="error.form.required">Ce champ est obligatoire</label>
+			<label index="error.form.mustBeEmpty">Ce champ doit être vide</label>
+			<label index="error.form.email">Ce champ doit être un email valide</label>
 		</languageKey>
 	</data>
 </T3locallang>

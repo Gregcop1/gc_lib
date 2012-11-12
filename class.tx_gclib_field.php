@@ -31,7 +31,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
  * @package	TYPO3
  * @subpackage tx_gclib
  */
- class tx_gclib_field extends tx_gclib_base {
+class tx_gclib_field extends tx_gclib_base {
 	var $conf;
 	var $template;
 	var $type;
@@ -57,86 +57,105 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 *
 	 * @return	The content that is displayed on the website
 	 */
-	 function main($template, $type, $name, $value, $label='',  $validator = array(), $class='', $id = '') {
-	 	 parent:: main();
+	function main($template, $type, $name, $value, $label='',  $validator = array(), $class='', $id = '') {
+		parent:: main();
 
-	 	 $this->template = $template;
-	 	 $this->type = $type;
-	 	 $this->name = $name;
-	 	 $this->value = $value;
-	 	 $this->label = $label;
-	 	 $this->class = $class;
-	 	 $this->validator = $validator;
-	 	 $this->id = $id;
-	 	 if( !$this->id ) {
-	 	 	 $this->id = $this->name;
-	 	 }
+		$this->template = $template;
+		$this->type = $type;
+		$this->name = $name;
+		$this->value = $value;
+		$this->label = $label;
+		$this->class = $class;
+		$this->validator = explode(',',$validator);
+		$this->id = $id;
+		if( !$this->id ) {
+			$this->id = $this->name;
+		}
 
-	 	 return $this;
-	 }
+		return $this;
+	}
 
 	 /**
 	  * Rendering the field
 	  *
 	  * @return the HTML rendering of the field
 	  */
-	  function render() {
-	 	 $out = '';
-	 	 $field = '';
-
-	 	 //try to validate the field to build error
-	 	 $error = $this->validate();
+	 function render() {
+	 	$out = '';
+	 	$field = '';
 
 	 	 //build the label
-	 	 $label = $this->getLabel();
+	 	$label = $this->getLabel();
 
 	 	 //build the tag
-	 	 switch($this->type) {
-	 	 	case 'hidden':
-			case 'submit':
-			case 'text':{
-				$format = '<%s id="%s" name="%s" class="%s" value="%s"/>';
-			}break;
-			case 'textarea':
-			case 'select': {
-				$format = '<%s id="%s" name="%s" class="%s">%s</%s>';
-			}break;
-	 	 }
+	 	switch($this->type) {
+	 		case 'hidden':
+	 		case 'submit':
+	 		case 'text':{
+	 			$format = '<%s id="%s" name="%s" class="%s" value="%s"/>';
+	 		}break;
+	 		case 'textarea':
+	 		case 'select': {
+	 			$format = '<%s id="%s" name="%s" class="%s">%s</%s>';
+	 		}break;
+	 	}
 
-	 	 $field = sprintf($format, $this->getTagName(), $this->id, $this->getName(), $this->getClass(), $this->getValue(), $this->getClosureTag());
+	 	$field = sprintf($format, $this->getTagName(), $this->id, $this->getName(), $this->getClass(), $this->getValue(), $this->getClosureTag());
 
-	 	 if( trim($this->template) != '' ){
-	 	 	 $subpartArray['###LABEL###'] = $label;
-	 	 	 $subpartArray['###FIELD###'] = $field;
-	 	 	 $subpartArray['###ERROR###'] = $this->error;
-	 	 	 $this->applyMarkers ( $config['markers.'], $subpartArray );
-	 	 	 $out = $this->cObj->substituteMarkerArrayCached($this->template, array(),$subpartArray);
+	 	if( trim($this->template) != '' ){
+	 		$subpartArray['###LABEL###'] = $label;
+	 		$subpartArray['###FIELD###'] = $field;
+	 		$subpartArray['###ERROR###'] = $this->error;
+	 		$this->applyMarkers ( $config['markers.'], $subpartArray );
+	 		$out = $this->cObj->substituteMarkerArrayCached($this->template, array(),$subpartArray);
 
-	 	 	 return $out;
-	 	 }else {
-	 	 	 return $field;
-	 	 }
+	 		return $out;
+	 	}else {
+	 		return $field;
+	 	}
 	 }
 
 	 /**
-	  * Apply all validators, separated by comma, to the field
+	  * Check if the field is valid
+	  *
+	  * @return a boolean
+	  */
+	 function isValid() {
+	 	if($this->validator && isset($this->piVars[$this->name])) {
+	 		foreach($this->validator as $item) {
+	 			if( $this->error != '' ) {
+	 				continue;
+	 			}
+
+	 			$this->error .= $this->checkValidator( $item );
+	 		}
+	 	}
+
+	 	return $this->error == '';
+	 }
+
+	 /**
+	  * Check one validator
 	  *
 	  * @return Errors
 	  */
-	  function validate() {
-	 	 $error = '';
+	 function checkValidator($validator) {
+        $this->pi_loadLL();
 
+	 	$error = '';
+	 	switch($validator) {
+	 		case 'required':
+	 			$error = (trim($this->piVars[$this->name])=='' ? $this->pi_getLL('error.form.required') : '');
+	 		break;
+	 		case 'mustBeEmpty':
+	 			$error = (trim($this->piVars[$this->name])!='' ? $this->pi_getLL('error.form.mustBeEmpty') : '');
+	 		break;
+	 		case 'email':
+	 			$error = (!preg_match("/^[^@]*@[^@]*\.[^@]*$/", trim($this->piVars[$this->name])) ? $this->pi_getLL('error.form.email') : '');
+	 		break;
+	 	}
 
-	 	 if($this->validator && $this->piVars[$this->name]) {
-	 	 	 foreach($this->validator as $item) {
-	 	 	 	 if( $error != '' ) {
-	 	 	 	 	 continue;
-	 	 	 	 }
-
-	 	 	 	 $error .= $item.'+';
-	 	 	 }
-	 	 }
-	 	 return $error;
+	 	return $error;
 	 }
 
 	 /**
@@ -144,21 +163,21 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return Tag name
 	  */
-	  function getTagName(){
-	 	 $str = '';
+	 function getTagName(){
+	 	$str = '';
 
-	 	 switch($this->type) {
-	 	 	case 'hidden':
-	 	 	case 'submit':
-	 	 	case 'text':{
-	 	 		$str = 'input type="'.$this->type.'"';
-	 	 	}break;
-	 	 	default :{
-	 	 		$str = $this->type;
-	 	 	}break;
-	 	 }
+	 	switch($this->type) {
+	 		case 'hidden':
+	 		case 'submit':
+	 		case 'text':{
+	 			$str = 'input type="'.$this->type.'"';
+	 		}break;
+	 		default :{
+	 			$str = $this->type;
+	 		}break;
+	 	}
 
-	 	 return $str;
+	 	return $str;
 	 }
 
 	 /**
@@ -166,12 +185,12 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return Label
 	  */
-	  function getLabel() {
-	 	 if( $this->label ) {
-	 	 	 return '<label for="'.$this->id.'">'.$this->label.'</label>';
-	 	 }else {
-	 	 	 return '';
-	 	 }
+	 function getLabel() {
+	 	if( $this->label ) {
+	 		return '<label for="'.$this->id.'">'.$this->label.'</label>';
+	 	}else {
+	 		return '';
+	 	}
 	 }
 
 	 /**
@@ -179,8 +198,8 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return Name
 	  */
-	  function getName() {
-	 	 return $this->prefixId.'['.$this->name.']';
+	 function getName() {
+	 	return $this->prefixId.'['.$this->name.']';
 	 }
 
 	 /**
@@ -188,25 +207,25 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return Value
 	  */
-	  function getValue() {
-		 if( is_array($this->value) ) {
-			 $res = '';
-			 foreach($this->value as $it) {
-				 switch( $this->type ) {
-					 case 'select':{
-							 $res .= '<option value="'.$it['value'].'"'.( ($this->piVars[$this->name] && $it['value'] == $this->piVars[$this->name]) ? ' selected' : '' ).'>'.$this->getIndentation($it['depth']).$it['label'].'</option>';
-					 }break;
-				 }
-			 }
+	 function getValue() {
+	 	if( is_array($this->value) ) {
+	 		$res = '';
+	 		foreach($this->value as $it) {
+	 			switch( $this->type ) {
+	 				case 'select':{
+	 					$res .= '<option value="'.$it['value'].'"'.( ($this->piVars[$this->name] && $it['value'] == $this->piVars[$this->name]) ? ' selected' : '' ).'>'.$this->getIndentation($it['depth']).$it['label'].'</option>';
+	 				}break;
+	 			}
+	 		}
 
-			 return $res;
-		 }else {
-			 if( $val = $this->piVars[$this->name] ){
-				 return $val;
-			 }else {
-			 	 return $this->value;
-			 }
-	 	 }
+	 		return $res;
+	 	}else {
+	 		if( $val = $this->piVars[$this->name] ){
+	 			return $val;
+	 		}else {
+	 			return $this->value;
+	 		}
+	 	}
 	 }
 
 	 /**
@@ -214,12 +233,12 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return closure tag
 	  */
-	  function getClosureTag() {
-	 	 if(in_array( $this->type, array('textarea', 'select'))) {
-	 	 	 return $this->type;
-	 	 }else {
-	 	 	 return '';
-	 	 }
+	 function getClosureTag() {
+	 	if(in_array( $this->type, array('textarea', 'select'))) {
+	 		return $this->type;
+	 	}else {
+	 		return '';
+	 	}
 	 }
 
 	 /**
@@ -227,14 +246,14 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return classes
 	  */
-	  function getClass() {
-	 	 $class = $this->type.( $this->class ? ' '.$this->class : '' );
+	 function getClass() {
+	 	$class = $this->type.( $this->class ? ' '.$this->class : '' );
 
-	 	 if($this->error) {
-	 	 	 $class .= ' error '.$this->type.'_error';
-	 	 }
+	 	if($this->error) {
+	 		$class .= ' error '.$this->type.'_error';
+	 	}
 
-	 	 return $class;
+	 	return $class;
 	 }
 
 	 /**
@@ -244,18 +263,18 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  *
 	  * @return	HTML indentation
 	  */
-	  function getIndentation( $counter ) {
-	 	 $str = '';
-	 	 for( $i=0; $i<($counter-1); $i++ ) {
-	 	 	 $str .= '&nbsp;&nbsp;';
-	 	 }
-	 	 return $str;
+	 function getIndentation( $counter ) {
+	 	$str = '';
+	 	for( $i=0; $i<($counter-1); $i++ ) {
+	 		$str .= '&nbsp;&nbsp;';
+	 	}
+	 	return $str;
 	 }
 
 
- }
+	}
 
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/gc_lib/class.tx_gclib_field.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/gc_lib/class.tx_gclib_field.php']);
-}
+	if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/gc_lib/class.tx_gclib_field.php'])	{
+		include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/gc_lib/class.tx_gclib_field.php']);
+	}
