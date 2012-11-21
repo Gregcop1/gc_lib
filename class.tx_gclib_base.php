@@ -91,6 +91,9 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 		 }
 
 	  	 $subpartArray['###CONTENT###'] = $out;
+	  	 
+	  	 $subpartArray['###PAGERS###'] = $this->getListGetPageBrowser($this->totalResults); //t3lib_div::debug(array($subpartArray['###PAGERS###']));
+	  	 
 	  	 $this->applyMarkers ( $configuration['markers.'], $subpartArray );
 
 	  	 return $subpartArray;
@@ -119,6 +122,21 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 	  		return $this->pi_getLL('error.noTemplateFound');
 	  	}
 	  }
+
+	function getListGetPageBrowser($numberOfPages) {
+		// Get default configuration
+		$conf = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_pagebrowse_pi1.'];
+		// Modify this configuration
+		$conf += array(
+    		'pageParameterName' => $this->prefixId . '|page',
+    		'numberOfPages' => intval($numberOfPages/$this->config['limit']) + (($numberOfPages % $this->config['limit']) == 0 ? 0 : 1),
+  		);
+		// Get page browser
+		$cObj = t3lib_div::makeInstance('tslib_cObj');
+		/* @var $cObj tslib_cObj */
+		$cObj->start(array(), '');
+		return $cObj->cObjGetSingle('USER', $conf);
+	}
  }
 
 

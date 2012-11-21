@@ -55,6 +55,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 		 	$this->initStaticQueryParts();
 		 	$this->initFilterQueryParts();
 		 	$this->results = $this->execQuery( $this->query );
+		 	$this->totalResults = count($this->execQueryTotal( $this->query ));
 		}
 	}	
 	 
@@ -66,8 +67,14 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  * Init the static parts of the query
 	  *
 	  */
-	  function initStaticQueryParts() {
-	  	
+	function initStaticQueryParts() {
+		
+		if ($this->config['enablePager']){
+			if ($this->piVars['page'] > 0){
+				$this->config['limit'] = $this->piVars['page']*$this->config['limit'].','.($this->piVars['page']+1)*$this->config['limit'];
+			}
+		}
+	 	 
 	 	 $this->query = array(
 	 	 	 'SELECT' => $this->tableName.'.*',
 	 	 	 'FROM' => $this->tableName,
@@ -97,6 +104,24 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 			$query['GROUP BY'],
 			$query['ORDER BY'],
 			$query['LIMIT']
+		);
+	}
+ 
+	/**
+	 * Execute a SELECT query without LIMIT
+	 * 
+	 * @param array $query: builded query
+	 *
+	 * @return result Total number of the query 
+	 */
+	 function execQueryTotal($query) {
+		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+			$query['SELECT'],
+			$query['FROM'],
+			$query['WHERE'],
+			$query['GROUP BY'],
+			$query['ORDER BY'],
+			''
 		);
 	}
  }
