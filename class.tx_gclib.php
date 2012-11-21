@@ -210,8 +210,6 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
 				        	$setup .= '<INCLUDE_TYPOSCRIPT: source="FILE:EXT:'.$key.'/'.$folder.$file.'">'.$eol;
 				        }
 				    }
-
-				    closedir($handle);
 				}
   			}
 
