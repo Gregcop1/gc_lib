@@ -92,6 +92,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 
 	  	 $subpartArray['###CONTENT###'] = $out;
 	  	 
+	  	 $subpartArray['###PAGERS###'] = '';
 	  	 $subpartArray['###PAGERS###'] = $this->getListGetPageBrowser($this->totalResults); //t3lib_div::debug(array($subpartArray['###PAGERS###']));
 	  	 
 	  	 $this->applyMarkers ( $configuration['markers.'], $subpartArray );

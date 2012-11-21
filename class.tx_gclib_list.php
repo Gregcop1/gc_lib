@@ -67,15 +67,15 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	  * Init the static parts of the query
 	  *
 	  */
-	function initStaticQueryParts() {
-		
-		if ($this->config['enablePager']){
-			if ($this->piVars['page'] > 0){
-				$this->config['limit'] = $this->piVars['page']*$this->config['limit'].','.($this->piVars['page']+1)*$this->config['limit'];
+		function initStaticQueryParts() {
+			
+			if ($this->config['enablePager']){
+				if ($this->piVars['page'] > 0){
+					$this->config['limit'] = $this->piVars['page']*$this->config['limit'].','.($this->piVars['page']+1)*$this->config['limit'];
+				}
 			}
-		}
 	 	 
-	 	 $this->query = array(
+	 	 	$this->query = array(
 	 	 	 'SELECT' => $this->tableName.'.*',
 	 	 	 'FROM' => $this->tableName,
 	 	 	 'WHERE' => '1'
@@ -84,7 +84,7 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib_base.php');
 	 	 	 'GROUP BY' => ($this->config['groupBy'] ? $this->config['groupBy'] : ''),
 	 	 	 'ORDER BY' => ($this->config['orderBy'] ? $this->config['orderBy'] : ''),
 	 	 	 'LIMIT' => ($this->config['limit'] ? $this->config['limit'] : '')
-	 	 	 );
+	 	 	);
 	 }
 
 	 function initFilterQueryParts(){}
