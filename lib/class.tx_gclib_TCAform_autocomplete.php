@@ -45,9 +45,9 @@ class tx_gclib_TCAform_autocomplete {
         $fobj->additionalCode_pre[] = '
             <link rel="stylesheet" type="text/css" href="'.t3lib_extMgm::extRelPath('gc_lib').'res/style/be_autocomplete.css" />
             <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/jquery.js" type="text/javascript"></script>
-            <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/be_autocomplete.js" type="text/javascript"></script>
+            <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/gc.autocomplete.js" type="text/javascript"></script>
             <script type="text/javascript">
-                autocomplete_array["'.$itemFormElName.'_possibilities"] = [
+                gc.autocomplete.autocomplete_array["'.$itemFormElName.'_possibilities"] = [
                         {
                             id:1,
                             label:"optimisation"
@@ -55,6 +55,14 @@ class tx_gclib_TCAform_autocomplete {
                         {
                             id:2,
                             label:"configuration"
+                        },
+                        {
+                            id:3,
+                            label:"optimus"
+                        },
+                        {
+                            id:4,
+                            label:"conficius"
                         }
                 ];
             </script>';
