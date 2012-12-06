@@ -12,6 +12,16 @@ jQuery.fn.extend({
   }
 });
 
+String.prototype.format = function() {
+  var args = arguments;
+  return this.replace(/{(\d+)}/g, function(match, number) { 
+    return typeof args[number] != 'undefined'
+      ? args[number]
+      : match
+    ;
+  });
+};
+
 jQuery(document).ready(function() {
     jQuery('<ul/>')
         .addClass('autocomplete_container')
@@ -22,6 +32,7 @@ jQuery(document).ready(function() {
 
     jQuery('input.autocomplete').keydown(gc.autocomplete.keyDown)
     jQuery('input.autocomplete').keyup(gc.autocomplete.keyUp)
+    gc.autocomplete.buildSelectedList(jQuery('input.autocomplete'));
 });
 
 if(!gc) {
@@ -29,11 +40,13 @@ if(!gc) {
 }
 
 gc.autocomplete = {
+    configuration_array: [],
     autocomplete_array: [],
     currentField: '',
-
     keyUp: function(e){
         switch (e.keyCode) {
+            case 188 :
+            case 186 :
             case 13 :
                 jQuery('.autocomplete_container .highlighted').trigger('click');
             break;
@@ -53,6 +66,8 @@ gc.autocomplete = {
 
     keyDown: function(e){
         switch (e.keyCode) {
+            case 188 :
+            case 186 :
             case 13 :
             case 40:
             case 38:
@@ -80,38 +95,40 @@ gc.autocomplete = {
 
     change: function(field) {
         gc.autocomplete.currentField = field;
-        var possibilities = this.autocomplete_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')];
         var value = jQuery(gc.autocomplete.currentField).val();
-        var list = jQuery('.autocomplete_container')
-                        .css({
-                            'top': parseInt(jQuery(gc.autocomplete.currentField).findPos().y+20)+'px',
-                            'left': parseInt(jQuery(gc.autocomplete.currentField).findPos().x)+'px',
-                        });
+        if(value!='') {
+            var possibilities = this.autocomplete_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')];
+            var list = jQuery('.autocomplete_container')
+                            .css({
+                                'top': parseInt(jQuery(gc.autocomplete.currentField).findPos().y+20)+'px',
+                                'left': parseInt(jQuery(gc.autocomplete.currentField).findPos().x)+'px',
+                            });
 
-        list.empty();
-        list.append(jQuery('<li/>')
-                        .attr('value', 'new')
-                        .attr('label', value)
-                        .html('Créer <strong>'+value+'</strong>')
-                        .click(this.selectWordOnList));
-        
-        for(i in possibilities) {
-            var curr = possibilities[i];
+            list.empty();
+            list.append(jQuery('<li/>')
+                            .attr('value', 'new')
+                            .attr('label', value)
+                            .html('Créer <strong>'+value+'</strong>')
+                            .click(this.selectWordOnList));
+            
+            for(i in possibilities) {
+                var curr = possibilities[i];
 
-            var reg = new RegExp(value.split('').join('[\\w+@+:]*'), "i");
-            if((typeof curr === "object") && curr.label.match(reg)){
-                list.append(jQuery('<li/>')
-                                .attr('value', curr.id)
-                                .attr('label', curr.label)
-                                .html(curr.label)
-                                .click(this.selectWordOnList));
+                var reg = new RegExp(value.split('').join('[\\w+@+:]*'), "i");
+                if((typeof curr === "object") && curr.label.match(reg)){
+                    list.append(jQuery('<li/>')
+                                    .attr('value', curr.id)
+                                    .attr('label', curr.label)
+                                    .html(curr.label)
+                                    .click(this.selectWordOnList));
+                }
             }
-        }
 
-        if(value && list.children('li').length) {
-            this.showAutoCompletePopup();
+            if(value && list.children('li').length) {
+                this.showAutoCompletePopup();
+            }
         }else {
-            this.removeAutoCompletePopup()
+            gc.autocomplete.removeAutoCompletePopup();
         }
     },
 
@@ -121,6 +138,7 @@ gc.autocomplete = {
     },
 
     removeAutoCompletePopup: function() {
+        jQuery(gc.autocomplete.currentField).val('');
         jQuery('.autocomplete_container').empty()
                                         .hide();
     },
@@ -130,7 +148,6 @@ gc.autocomplete = {
             id: jQuery(this).attr('value'),
             label: jQuery(this).attr('label')
         });
-        gc.autocomplete.removeAutoCompletePopup();
     },
 
     highlightWord: function(container) {
@@ -139,6 +156,116 @@ gc.autocomplete = {
     },
 
     selectWord: function(word) {
-        console.log([ 'Mot selectionné', word ])
+        if(this.isItANewWord(word)) {
+            var possibilities = this.autocomplete_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')];
+            var configuration = this.configuration_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')]
+
+            new Ajax.Request('ajax.php', {
+                method: 'get',
+                parameters: 'ajaxID=tx_gclib_TCAform_autocomplete::saveNewAutoCompleteItem&tableName='+configuration.tableName+'&labelField='+configuration.labelField+'&word='+word.label+'&storagePid='+configuration.storagePid,
+                onComplete: function(xhr, json) {
+                    var newWord = {
+                        id: json.id,
+                        label: json.label
+                    };
+                    this.autocomplete_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')].push(newWord);
+                    gc.autocomplete.sendToList(newWord);
+                }.bind(this),
+                onT3Error: function(xhr, json) {
+                    console.log('error')
+                }.bind(this)
+            });
+        }else {
+            this.sendToList(word);
+        }
+
+    },
+
+    sendToList: function(word) {
+        var targetField = jQuery(this.currentField).siblings('input[name="'+jQuery(this.currentField).attr('name').replace('_auto','')+'"]');
+        var currentValues = jQuery(targetField).attr('value').split(',');
+        var configuration = this.configuration_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')]
+        var newValue = configuration.fieldFormat.format(word.id, word.label)
+
+        if(jQuery.inArray(newValue, currentValues) ==-1 ){
+            currentValues.push(newValue);
+            jQuery(targetField).attr('value', currentValues.join(','));
+            this.buildSelectedList();
+        }
+
+        gc.autocomplete.removeAutoCompletePopup();
+    },
+
+    isItANewWord: function(word) {
+        var possibilities = this.autocomplete_array[jQuery('input[name="'+jQuery(this.currentField).attr('name')+'"]').attr('autocomplete_array')];
+        for(var i in possibilities){
+            if(typeof possibilities[i] == "object" && possibilities[i].label == word.label) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    buildSelectedList: function(field) {
+        if(!field) {
+            field = jQuery(this.currentField);
+        }
+        var targetField = field.siblings('input[name="'+field.attr('name').replace('_auto','')+'"]');
+        var possibilities = this.autocomplete_array[jQuery('input[name="'+field.attr('name')+'"]').attr('autocomplete_array')];
+        var list = field.siblings('.resultList');
+        var values = targetField.attr('value').split(',');
+
+        list.empty();
+        if(values.length) {
+            for(var i in values) {
+                if(typeof values[i] == "string") {
+                    var id = parseInt(values[i]);
+                    var obj = this.getPossibilityById(id, field);
+                    if(obj) {
+                        list.append(jQuery('<a/>').attr('href','javascript:;')
+                                            .attr('label',obj.label)
+                                            .addClass('autocomplete_item')
+                                            .html(obj.label+'&nbsp;&#10006;')
+                                            .click(this.removeFromList));
+                    }
+                }
+            }
+        }
+    },
+
+    getPossibilityById: function(id, field) {
+        if(!field) {
+            field = jQuery(this.currentField);
+        }
+        var possibilities = this.autocomplete_array[jQuery('input[name="'+field.attr('name')+'"]').attr('autocomplete_array')];
+        for(var i in possibilities) {
+            if(possibilities[i].id == id) {
+                return possibilities[i];
+            }
+        }
+
+        return null;
+    },
+
+    removeFromList: function() {
+        var field = jQuery(this).parent().siblings('.autocomplete');
+        gc.autocomplete.currentField = field;
+        var targetField = field.siblings('input[name="'+field.attr('name').replace('_auto','')+'"]');
+        var values = targetField.attr('value').split(',');
+
+        var i = 0;
+        while(i < values.length) {
+            var id = parseInt(values[i]);
+            var obj = gc.autocomplete.getPossibilityById(id, field);
+            if( obj && obj.label == jQuery(this).attr('label') ) {
+                values.splice(i,1);
+            }else {
+                i++;
+            }
+        }
+
+        jQuery(targetField).attr('value', values.join(','));
+        gc.autocomplete.buildSelectedList();
     }
 };
