@@ -25,7 +25,7 @@ String.prototype.format = function() {
 jQuery(document).ready(function() {
     jQuery('<ul/>')
         .addClass('autocomplete_container')
-        .appendTo('body');
+        .insertAfter(jQuery('input.autocomplete').parents('.typo3-TCEforms'));
     jQuery('<div/>')
         .addClass('resultList')
         .appendTo(jQuery('input.autocomplete').parent());
@@ -96,12 +96,15 @@ gc.autocomplete = {
     change: function(field) {
         gc.autocomplete.currentField = field;
         var value = jQuery(gc.autocomplete.currentField).val();
+        
         if(value!='') {
             var possibilities = this.autocomplete_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')];
+            var fieldPos = jQuery(gc.autocomplete.currentField).findPos();
+        
             var list = jQuery('.autocomplete_container')
                             .css({
-                                'top': parseInt(jQuery(gc.autocomplete.currentField).findPos().y+20)+'px',
-                                'left': parseInt(jQuery(gc.autocomplete.currentField).findPos().x)+'px',
+                                'top': parseInt(fieldPos.y-27)+'px',
+                                'left': parseInt(fieldPos.x)+'px',
                             });
 
             list.empty();
@@ -183,17 +186,24 @@ gc.autocomplete = {
 
     sendToList: function(word) {
         var targetField = jQuery(this.currentField).siblings('input[name="'+jQuery(this.currentField).attr('name').replace('_auto','')+'"]');
-        var currentValues = jQuery(targetField).attr('value').split(',');
         var configuration = this.configuration_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')]
-        var newValue = configuration.fieldFormat.format(word.id, word.label)
-
-        if(jQuery.inArray(newValue, currentValues) ==-1 ){
-            currentValues.push(newValue);
-            jQuery(targetField).attr('value', currentValues.join(','));
-            this.buildSelectedList();
+        var currentValues = jQuery(targetField).attr('value').split(',');
+        if(jQuery(targetField).attr('value')=='') {
+            currentValues = [];
         }
 
-        gc.autocomplete.removeAutoCompletePopup();
+        var newWord = this.getWordByLabel(word.label);
+        if(newWord) {
+            var newValue = configuration.fieldFormat.format(newWord.id, newWord.label)
+
+            if(jQuery.inArray(newValue, currentValues) ==-1 ){
+                currentValues.push(newValue);
+                jQuery(targetField).attr('value', currentValues.join(','));
+                this.buildSelectedList();
+            }
+
+            gc.autocomplete.removeAutoCompletePopup();
+        }
     },
 
     isItANewWord: function(word) {
@@ -217,11 +227,11 @@ gc.autocomplete = {
         var values = targetField.attr('value').split(',');
 
         list.empty();
-        if(values.length) {
+        if(targetField.attr('value')!='' && values.length) {
             for(var i in values) {
                 if(typeof values[i] == "string") {
-                    var id = parseInt(values[i]);
-                    var obj = this.getPossibilityById(id, field);
+                    var id = values[i].match(/\d+/g);
+                    var obj = this.getWordById(id, field);
                     if(obj) {
                         list.append(jQuery('<a/>').attr('href','javascript:;')
                                             .attr('label',obj.label)
@@ -234,7 +244,21 @@ gc.autocomplete = {
         }
     },
 
-    getPossibilityById: function(id, field) {
+    getWordByLabel: function(label, field) {
+        if(!field) {
+            field = jQuery(this.currentField);
+        }
+        var possibilities = this.autocomplete_array[jQuery('input[name="'+field.attr('name')+'"]').attr('autocomplete_array')];
+        for(var i in possibilities) {
+            if(possibilities[i].label == label) {
+                return possibilities[i];
+            }
+        }
+
+        return null;
+    },
+
+    getWordById: function(id, field) {
         if(!field) {
             field = jQuery(this.currentField);
         }
@@ -256,8 +280,8 @@ gc.autocomplete = {
 
         var i = 0;
         while(i < values.length) {
-            var id = parseInt(values[i]);
-            var obj = gc.autocomplete.getPossibilityById(id, field);
+            var id = values[i].match(/\d+/g);
+            var obj = gc.autocomplete.getWordById(id, field);
             if( obj && obj.label == jQuery(this).attr('label') ) {
                 values.splice(i,1);
             }else {
