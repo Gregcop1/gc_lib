@@ -1,4 +1,4 @@
-.autocomplete_container { display: none; position: absolute; padding: 10px; border: 1px solid #555; background-color: white; z-index: 100; }
+.autocomplete_container { display: none; position: absolute; padding: 10px; border: 1px solid #555; background-color: white; z-index: 3000; }
 .autocomplete_container li { padding: 3px 5px; cursor: pointer; }
 .autocomplete_container li:hover { background-color: #dedede; }
 .autocomplete_container li.highlighted { background-color: #cccccc; }

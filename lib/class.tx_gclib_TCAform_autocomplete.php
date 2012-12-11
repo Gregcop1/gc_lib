@@ -38,12 +38,10 @@ class tx_gclib_TCAform_autocomplete {
 
     function renderAutoCompleteField(&$PA, &$fobj) {
         $this->init($PA);
-        // $this->doc->loadJavascriptLib('contrib/prototype/prototype.js');
-        // $this->doc->loadJavascriptLib('js/common.js');
 
         $itemFormElName = $this->PA['itemFormElName'];
         $itemFormElValue = $this->PA['itemFormElValue'];
-        $itemTableName = $this->PA['fieldConf']['config']['foreign_table'];
+        $itemTableName = ($this->PA['fieldConf']['config']['type']=='select' ? $this->PA['fieldConf']['config']['foreign_table'] : $this->PA['fieldConf']['config']['allowed']);
         $itemLabelField = $this->PA['fieldConf']['config']['labelField'];
         $itemStoragePid = ($this->PA['fieldConf']['config']['storagePid'] ? $this->PA['fieldConf']['config']['storagePid'] : $this->PA['row']['uid']);
 
@@ -75,7 +73,7 @@ class tx_gclib_TCAform_autocomplete {
                 gc.autocomplete.configuration_array["'.$itemFormElName.'"] = {
                     tableName: "'.$itemTableName.'",
                     labelField: "'.$itemLabelField.'",
-                    fieldFormat: "'.($this->PA['fieldConf']['config']['type']=='select' ? '{0}|{1}' : $this->PA['fieldConf']['config']['foreign_table'].'_{0}' ).'",
+                    fieldFormat: "'.($this->PA['fieldConf']['config']['type']=='select' ? '{0}|{1}' : $itemTableName.'_{0}|{1}' ).'",
                     storagePid: "'.$itemStoragePid.'"
                 };
                 gc.autocomplete.autocomplete_array["'.$itemFormElName.'"] = ['.implode(',', $possibilities).'];
