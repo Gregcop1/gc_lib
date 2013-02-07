@@ -21,7 +21,15 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-require_once(PATH_tslib.'class.tslib_pibase.php');
+if (@is_dir(PATH_site.'typo3/sysext/cms/tslib/')) {
+        define('PATH_tslib', PATH_site.'typo3/sysext/cms/tslib/');
+} elseif (@is_dir(PATH_site.'tslib/')) {
+        define('PATH_tslib', PATH_site.'tslib/');
+} else {
+        $configured_tslib_path = '';
+        define('PATH_tslib', $configured_tslib_path);
+}
+require_once(PATH_tslib.'/class.tslib_pibase.php');
 
 /**
  * Plugin 'Library GC' for the 'gc_lib' extension.
