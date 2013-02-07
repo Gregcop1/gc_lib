@@ -84,19 +84,24 @@ require_once(t3lib_extMgm::extPath('gc_lib').'class.tx_gclib.php');
 		 if( $results && count($results) ) {
 			 foreach($results as $item) {
 				$markerArray=array();
+				$row = false;
 
-				if ($GLOBALS['TSFE']->sys_language_content > 0 && isset($item['sys_language_uid'])) {
-				  $item = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+				if (isset($item['sys_language_uid'])) {
+				  $row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
 				      $this->tableName,
 				      $item,
 				      $GLOBALS['TSFE']->sys_language_content,
-				      $GLOBALS['TSFE']->sys_language_contentOL
+				      'hideNonTranslated'
 				  );
+				}else {
+					$row = $item;
 				}
 
-				$this->cObj->start( $item, $this->tableName );
-				$this->applyMarkers ( $configuration['markers.'], $markerArray );
-				$out .= $this->cObj->substituteMarkerArrayCached($template['item'],$markerArray);
+				if($row) {
+					$this->cObj->start( $row, $this->tableName );
+					$this->applyMarkers ( $configuration['markers.'], $markerArray );
+					$out .= $this->cObj->substituteMarkerArrayCached($template['item'],$markerArray);
+				}
 			 }
 		 }
 
