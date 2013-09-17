@@ -14,12 +14,16 @@ jQuery.fn.extend({
 
 String.prototype.format = function() {
   var args = arguments;
-  return this.replace(/{(\d+)}/g, function(match, number) { 
+  return this.replace(/{(\d+)}/g, function(match, number) {
     return typeof args[number] != 'undefined'
       ? args[number]
       : match
     ;
   });
+};
+
+String.prototype.decodeURIComponent = function() {
+  return decodeURIComponent(this);
 };
 
 jQuery(document).ready(function() {
@@ -96,11 +100,11 @@ gc.autocomplete = {
     change: function(field) {
         gc.autocomplete.currentField = field;
         var value = jQuery(gc.autocomplete.currentField).val();
-        
+
         if(value!='') {
             var possibilities = this.autocomplete_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')];
             var fieldPos = jQuery(gc.autocomplete.currentField).findPos();
-        
+
             var list = jQuery('.autocomplete_container')
                             .css({
                                 'top': parseInt(fieldPos.y-27)+'px',
@@ -113,7 +117,7 @@ gc.autocomplete = {
                             .attr('label', value)
                             .html('Créer <strong>'+value+'</strong>')
                             .click(this.selectWordOnList));
-            
+
             for(i in possibilities) {
                 var curr = possibilities[i];
 
@@ -187,7 +191,7 @@ gc.autocomplete = {
     sendToList: function(word) {
         var targetField = jQuery(this.currentField).siblings('input[name="'+jQuery(this.currentField).attr('name').replace('_auto','')+'"]');
         var configuration = this.configuration_array[jQuery(gc.autocomplete.currentField).attr('autocomplete_array')]
-        var currentValues = jQuery(targetField).attr('value').split(',');
+        var currentValues = jQuery(targetField).attr('value').decodeURIComponent().split(',');
         if(jQuery(targetField).attr('value')=='') {
             currentValues = [];
         }
@@ -230,7 +234,7 @@ gc.autocomplete = {
         if(targetField.attr('value')!='' && values.length) {
             for(var i in values) {
                 if(typeof values[i] == "string") {
-                    var id = values[i].match(/\d+/g);
+                    var id = values[i].match(/\d+/g)[0];
                     var obj = this.getWordById(id, field);
                     if(obj) {
                         list.append(jQuery('<a/>').attr('href','javascript:;')
@@ -276,7 +280,8 @@ gc.autocomplete = {
         var field = jQuery(this).parent().siblings('.autocomplete');
         gc.autocomplete.currentField = field;
         var targetField = field.siblings('input[name="'+field.attr('name').replace('_auto','')+'"]');
-        var values = targetField.attr('value').split(',');
+        var values = targetField.attr('value').decodeURIComponent().split(',');
+        console.log(field,values);
 
         var i = 0;
         while(i < values.length) {

@@ -53,7 +53,7 @@ class tx_gclib_TCAform_autocomplete {
             '',
             $itemLabelField
         );
-        
+
         $possibilities = array();
         if($res && count($res)) {
             foreach($res as $it) {
@@ -96,12 +96,12 @@ class tx_gclib_TCAform_autocomplete {
 
         $ajaxObj->setContentFormat('json');
         //insert in database
-        if($GLOBALS['TYPO3_DB']->exec_INSERTquery( $table, array( 
-            'pid' => $storagePid, 
+        if($GLOBALS['TYPO3_DB']->exec_INSERTquery( $table, array(
+            'pid' => $storagePid,
             'tstamp' => time(),
             'crdate' => time(),
             'cruser_id' => $BE_USER->user['uid'],
-            $labelField => $word 
+            $labelField => $word
         ))) {
             $ajaxObj->addContent('id', $GLOBALS['TYPO3_DB']->sql_insert_id());
             $ajaxObj->addContent('label', $word);
