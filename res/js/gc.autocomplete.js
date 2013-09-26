@@ -27,16 +27,18 @@ String.prototype.decodeURIComponent = function() {
 };
 
 jQuery(document).ready(function() {
-    jQuery('<ul/>')
-        .addClass('autocomplete_container')
-        .insertAfter(jQuery('input.autocomplete').parents('.typo3-TCEforms'));
-    jQuery('<div/>')
-        .addClass('resultList')
-        .appendTo(jQuery('input.autocomplete').parent());
+    jQuery('input.autocomplete').each( function() {
+        jQuery('<ul/>')
+            .addClass('autocomplete_container')
+            .insertAfter(jQuery(this).parents('.typo3-TCEforms'));
+        jQuery('<div/>')
+            .addClass('resultList')
+            .appendTo(jQuery(this).parent());
 
-    jQuery('input.autocomplete').keydown(gc.autocomplete.keyDown)
-    jQuery('input.autocomplete').keyup(gc.autocomplete.keyUp)
-    gc.autocomplete.buildSelectedList(jQuery('input.autocomplete'));
+        jQuery(this).keydown(gc.autocomplete.keyDown)
+        jQuery(this).keyup(gc.autocomplete.keyUp)
+        gc.autocomplete.buildSelectedList(jQuery(this));
+    });
 });
 
 if(!gc) {
@@ -229,7 +231,7 @@ gc.autocomplete = {
         var possibilities = this.autocomplete_array[jQuery('input[name="'+field.attr('name')+'"]').attr('autocomplete_array')];
         var list = field.siblings('.resultList');
         var values = targetField.attr('value').split(',');
-
+        console.log('input[name="'+field.attr('name')+'"]');
         list.empty();
         if(targetField.attr('value')!='' && values.length) {
             for(var i in values) {
@@ -238,10 +240,10 @@ gc.autocomplete = {
                     var obj = this.getWordById(id, field);
                     if(obj) {
                         list.append(jQuery('<a/>').attr('href','javascript:;')
-                                            .attr('label',obj.label)
-                                            .addClass('autocomplete_item')
-                                            .html(obj.label+'&nbsp;&#10006;')
-                                            .click(this.removeFromList));
+                        .attr('label',obj.label)
+                        .addClass('autocomplete_item')
+                        .html(obj.label+'&nbsp;&#10006;')
+                        .click(this.removeFromList));
                     }
                 }
             }
@@ -281,11 +283,10 @@ gc.autocomplete = {
         gc.autocomplete.currentField = field;
         var targetField = field.siblings('input[name="'+field.attr('name').replace('_auto','')+'"]');
         var values = targetField.attr('value').decodeURIComponent().split(',');
-        console.log(field,values);
 
         var i = 0;
         while(i < values.length) {
-            var id = values[i].match(/\d+/g);
+            var id = values[i].match(/\d+/g)[0];
             var obj = gc.autocomplete.getWordById(id, field);
             if( obj && obj.label == jQuery(this).attr('label') ) {
                 values.splice(i,1);

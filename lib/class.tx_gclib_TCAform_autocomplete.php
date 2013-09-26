@@ -64,21 +64,25 @@ class tx_gclib_TCAform_autocomplete {
             }
         }
 
-
-        $fobj->additionalCode_pre[] = '
-            <link rel="stylesheet" type="text/css" href="'.t3lib_extMgm::extRelPath('gc_lib').'res/style/be_autocomplete.css" />
-            <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/jquery.js" type="text/javascript"></script>
-            <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/gc.autocomplete.js" type="text/javascript"></script>
-            <script type="text/javascript">
-                gc.autocomplete.configuration_array["'.$itemFormElName.'"] = {
-                    tableName: "'.$itemTableName.'",
-                    labelField: "'.$itemLabelField.'",
-                    fieldFormat: "'.($this->PA['fieldConf']['config']['type']=='select' ? '{0}|{1}' : $itemTableName.'_{0}|{1}' ).'",
-                    storagePid: "'.$itemStoragePid.'"
-                };
-                gc.autocomplete.autocomplete_array["'.$itemFormElName.'"] = ['.implode(',', $possibilities).'];
-            </script>';
-
+        if (empty($fobj->additionalCode_pre['gclib-autocomplete-loadJSfile'])){
+            $fobj->additionalCode_pre['gclib-autocomplete-loadJSfile'] = '
+                <link rel="stylesheet" type="text/css" href="'.t3lib_extMgm::extRelPath('gc_lib').'res/style/be_autocomplete.css" />
+                <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/jquery.js" type="text/javascript"></script>
+                <script src="'.t3lib_extMgm::extRelPath('gc_lib').'res/js/gc.autocomplete.js" type="text/javascript"></script>
+            ';
+        }
+        if (empty($fobj->additionalCode_pre['gclib-autocomplete-'.$itemFormElName.'-loadJSfile'])) {
+            $fobj->additionalCode_pre['gclib-autocomplete-'.$itemFormElName.'-loadJSfile'] = '
+                <script type="text/javascript">
+                    gc.autocomplete.configuration_array["'.$itemFormElName.'"] = {
+                        tableName: "'.$itemTableName.'",
+                        labelField: "'.$itemLabelField.'",
+                        fieldFormat: "'.($this->PA['fieldConf']['config']['type']=='select' ? '{0}|{1}' : $itemTableName.'_{0}|{1}' ).'",
+                        storagePid: "'.$itemStoragePid.'"
+                    };
+                    gc.autocomplete.autocomplete_array["'.$itemFormElName.'"] = ['.implode(',', $possibilities).'];
+                </script>';
+        }
         // Assigned Categories
         $assignedCategories = t3lib_div::trimExplode(',',$this->PA['itemFormElValue'],1);
         $content = '<input type="text" name="'.$itemFormElName.'_auto" class="formField tceforms-textfield autocomplete" autocomplete_array="'.$itemFormElName.'" size="78" value="" />
